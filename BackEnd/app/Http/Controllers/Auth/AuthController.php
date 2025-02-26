@@ -21,7 +21,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -31,23 +31,6 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
-/*
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $user = Auth::user();
-        $token = $request->user()->createToken($user->email . '_Token')->plainTextToken;
-
-        return response()->json(['token' => $token, 'user' => $user], 200);
-    }*/
 
     public function login(Request $request)
     {
@@ -59,13 +42,14 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
         }
 
-        $token = $user->createToken($user->email . '_Token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(['token' => $token, 'user' => $user], 200);
     }
+
 
     public function logout(Request $request)
     {
