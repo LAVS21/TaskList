@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Http;
 
 class TaskController extends Controller
 {
@@ -25,7 +24,7 @@ class TaskController extends Controller
             'location' => 'required|string',
             'location' => 'required|string',
         ]);
-/*
+
         $task = Task::create($request->only(['title', 'description', 'due_date', 'location']));
 
         try {
