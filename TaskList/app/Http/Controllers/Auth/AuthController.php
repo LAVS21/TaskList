@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
 
 class AuthController extends Controller
 {
@@ -30,7 +28,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $token,
-        ]);
+        ], 201);
     }
 
     public function login(Request $request)
@@ -50,16 +48,18 @@ class AuthController extends Controller
 
         // Crear token con Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
+        $userId = $user->id;
 
-        return response()->json(['token' => $token, 'user' => $user], 200);
+        return response()->json([
+            'token' => $token,
+            'user' => $user,
+            'userId' => $userId,
+        ], 200);
     }
-
-
-
 
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Logged out']);
+        return response()->json(['message' => 'Sesión cerrada exitosamente']);
     }
 }

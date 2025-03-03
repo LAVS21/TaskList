@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->date('due_date');
@@ -22,3 +23,4 @@ return new class extends Migration {
         Schema::dropIfExists('tasks');
     }
 };
+

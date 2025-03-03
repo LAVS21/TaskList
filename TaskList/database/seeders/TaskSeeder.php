@@ -11,6 +11,7 @@ class TaskSeeder extends Seeder
     {
         // Crear algunas tareas de ejemplo
         Task::create([
+            'user_id' => 1,
             'title' => 'Tarea 1',
             'description' => 'Descripción de la tarea 1',
             "due_date" => "2025-03-01",
@@ -18,6 +19,7 @@ class TaskSeeder extends Seeder
         ]);
 
         Task::create([
+            'user_id' => 1,
             'title' => 'Tarea 2',
             'description' => 'Descripción de la tarea 2',
             "due_date" => "2025-03-01",
@@ -25,11 +27,11 @@ class TaskSeeder extends Seeder
         ]);
 
         Task::create([
+            'user_id' => 1,
             'title' => 'Tarea 3',
             'description' => 'Descripción de la tarea 3',
             "due_date" => "2025-03-01",
             "location" => "Madrid"
         ]);
-
     }
 }

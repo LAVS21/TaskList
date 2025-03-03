@@ -31,7 +31,7 @@ const LoginForm = () => {
         localStorage.setItem('auth_token', data.token);
 
         // Redirigir a la página de tareas
-        Inertia.visit('/tasks');
+        Inertia.visit('/Tasks');
       } else {
         const data = await response.json();
         setError(data.message || 'Credenciales incorrectas');

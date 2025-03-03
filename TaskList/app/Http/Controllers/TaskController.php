@@ -4,34 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
-use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
+use App\Http\Resources\TaskResource;
 
 class TaskController extends Controller
 {
+    public function index()
+    {
+        $tasks = Task::paginate(3);
+
+        return response()->json([
+            'tasks' => TaskResource::collection($tasks),
+            'pagination' => [
+                'current_page' => $tasks->currentPage(),
+                'last_page' => $tasks->lastPage(),
+                'total' => $tasks->total(),
+                'per_page' => $tasks->perPage(),
+            ]
+        ]);
+    }
 
     public function store(Request $request)
     {
-
-
-        $request->validate([
-            'title' => 'required|string',
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
             'description' => 'required|string',
             'due_date' => 'required|date',
-            'location' => 'required|string',
+            'location' => 'required|string|max:255',
         ]);
 
-        $task = Task::create($request->only(['title', 'description', 'due_date', 'location']));
+        $task = Task::create($validatedData);
 
-        try {
-            $task = Task::create($request->only(['title', 'description', 'due_date', 'location']));
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
         return response()->json($task, 201);
     }
-
-
 
     public function show(Task $task)
     {
@@ -40,14 +45,15 @@ class TaskController extends Controller
 
     public function update(Request $request, Task $task)
     {
-        $request->validate([
-            'title' => 'sometimes|string',
+        $validatedData = $request->validate([
+            'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'due_date' => 'sometimes|date',
             'completed' => 'sometimes|boolean',
+            'location' => 'sometimes|string|max:255',
         ]);
 
-        $task->update($request->only(['title', 'description', 'due_date', 'completed']));
+        $task->update($validatedData);
 
         return response()->json($task);
     }
@@ -57,43 +63,4 @@ class TaskController extends Controller
         $task->delete();
         return response()->json(['message' => 'Tarea eliminada'], 200);
     }
-
-    public function getWeather($id)
-    {
-        $task = Task::findOrFail($id);
-
-        $location = $task->location;
-
-        $apiKey = env('OPENWEATHER_API_KEY');
-        $response = Http::get("https://api.openweathermap.org/data/2.5/weather", [
-            'q' => $location,
-            'appid' => $apiKey,
-            'units' => 'metric',
-            'lang' => 'es',
-        ]);
-
-
-        if ($response->successful()) {
-            return response()->json([
-                'weather' => $response->json(),
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'No se pudo obtener el clima',
-            'error' => $response->status(),
-            'response' => $response->body(),
-        ], 400);
-    }
-
-    // app/Http/Controllers/TaskController.php
-    public function index()
-    {
-        // Lógica para obtener las tareas (si estás usando un modelo, por ejemplo)
-        $tasks = Task::all();
-
-        return Inertia::render('Tasks', ['tasks' => $tasks]);
-    }
-
-
 }

@@ -2,58 +2,43 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 use App\Http\Controllers\TaskController;
-use Inertia\Middleware;
+use App\Http\Controllers\WeatherController;
 
-// Mostrar todas las tareas
-Route::get('/', [TaskController::class, 'index']);
-
-// Crear una nueva tarea
-Route::post('/', [TaskController::class, 'store']);
-
-// Ver una tarea específica
-Route::get('/{task}', [TaskController::class, 'show']);
-
-// Actualizar una tarea
-Route::put('/{task}', [TaskController::class, 'update']);
-
-// Eliminar una tarea
-Route::delete('/{task}', [TaskController::class, 'destroy']);
-
-// Obtener el clima para una tarea específica
-Route::get('/{task}/weather', [TaskController::class, 'getWeather']);
-
-// Ruta principal para la página de bienvenida (home)
 Route::get('/', function () {
-    // Retorna la vista de bienvenida (Inertia)
     return Inertia::render('Welcome');
+
 })->name('home');
 
 
-// Ruta para el dashboard del usuario autenticado
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+// Rutas de tareas individuales protegidas
+Route::middleware(['auth'])->group(function () {
 
-// Rutas adicionales de configuración y autenticación
+    //Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+
+    Route::get('/tasks', function () {
+        return Inertia::render('Tasks');
+    })->name('tasks.index');
+
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Dashboard del usuario autenticado
+    Route::get('dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+});
+
+// Ruta para obtener el clima de la tarea
+Route::get('/tasks/{task}/weather', [WeatherController::class, 'getWeather'])->name('tasks.weather');
+
+// Rutas de autenticación y configuración
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
-
-// Aquí va la ruta para las páginas adicionales protegidas por Inertia
+// Redirección a bienvenida si se accede a `/welcome`
 Route::get('/welcome', function () {
     return Inertia::render('Welcome');
 });
-
-// Ruta para obtener la cookie CSRF necesaria para Sanctum
-Route::get('/sanctum/csrf-cookie', function () {
-    return response()->json(['message' => 'CSRF cookie set']);
-});
-
-// routes/web.php
-Route::middleware(['auth'])->group(function () {
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
-});
-
-
