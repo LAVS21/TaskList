@@ -63,4 +63,5 @@ class TaskController extends Controller
         $task->delete();
         return response()->json(['message' => 'Tarea eliminada'], 200);
     }
+
 }

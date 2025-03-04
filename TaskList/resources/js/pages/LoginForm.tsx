@@ -10,11 +10,13 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       await fetch('/sanctum/csrf-cookie', {
         method: 'GET',
         credentials: 'same-origin',
+        //credentials: 'include',
       });
 
       const response = await fetch('/api/login', {
@@ -22,20 +24,25 @@ const LoginForm = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
+
       if (response.ok) {
+
         const data = await response.json();
+        console.log(data);
         // Guardar el token en el almacenamiento local
         localStorage.setItem('auth_token', data.token);
 
         // Redirigir a la página de tareas
-        Inertia.visit('/Tasks');
+        Inertia.visit('/tasks');
       } else {
         const data = await response.json();
         setError(data.message || 'Credenciales incorrectas');
       }
+
     } catch (err) {
       // Manejo de excepciones
       setError('Hubo un error al intentar iniciar sesión. Inténtalo nuevamente.');

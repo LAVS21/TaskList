@@ -27,9 +27,9 @@ const Tasks: React.FC = () => {
 
                 const response = await fetch('/api/tasks', {
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json',
-                    }
+                    },
+                    credentials: 'include',
                 });
 
                 if (!response.ok) {
@@ -47,6 +47,40 @@ const Tasks: React.FC = () => {
 
         fetchTasks();
     }, []);
+
+    const createTask = async () => {
+        try {
+            // Obtener el CSRF token antes de la solicitud
+            await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            const response = await fetch('http://localhost:8000/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: "Tarea de ejemplo",
+                    description: "Descripción de la tarea",
+                    due_date: "2025-03-01",
+                    location: "Madrid"
+                }),
+                credentials: 'include' // Importante si usas cookies
+            });
+
+            if (response.ok) {
+                alert('Tarea creada correctamente');
+            } else {
+                alert('Error al crear la tarea');
+            }
+        } catch (error) {
+            console.error('Error creando la tarea:', error);
+        }
+    };
+
 
     if (loading) return <p className="text-center text-gray-600">Cargando tareas...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
