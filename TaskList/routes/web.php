@@ -17,7 +17,7 @@ Route::middleware(['auth'])->group(function () {
     //Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 
     Route::get('/tasks', function () {
-        return Inertia::render('Tasks');
+        return Inertia::render('TasksForm');
     })->name('tasks.index');
 
     Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
@@ -42,3 +42,5 @@ require __DIR__.'/auth.php';
 Route::get('/welcome', function () {
     return Inertia::render('Welcome');
 });
+
+
